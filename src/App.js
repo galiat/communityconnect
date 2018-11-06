@@ -21,9 +21,12 @@ class App extends Component {
     }
 
     this.callSheets = callSheets.bind(this);
+    
     this.toggleSavedResourcesPane = this.toggleSavedResourcesPane.bind(this);
+    this.orderResources = this.orderResources.bind(this);
     this.saveResource = this.saveResource.bind(this);
     this.removeResource = this.removeResource.bind(this);
+    this.uploadResources = this.uploadResources.bind(this);
   }
 
   getLocation = () => {
@@ -70,9 +73,21 @@ class App extends Component {
     });
   }
 
+  orderResources = (sourceIndex, destinationIndex) => {
+    let savedResources = this.state.savedResources.slice();
+
+    let movedResource = savedResources[sourceIndex];
+    savedResources.splice(sourceIndex, 1);
+    savedResources.splice(destinationIndex, 0, movedResource);
+
+    this.setState({
+      savedResources: savedResources,
+    })
+  }
+
   saveResource = (resource) => {
     let savedResources = null;
-    if(!this.state.savedResources.includes(resource)){
+    if(!this.state.savedResources.some(r => r.id == resource.id)){
       savedResources = this.state.savedResources.slice();
       savedResources.push(resource);
       this.setState({
@@ -83,12 +98,18 @@ class App extends Component {
 
   removeResource = (resource) => {
     let savedResources = null;
-    if(this.state.savedResources.includes(resource)){
+    if(this.state.savedResources.some(r => r.id == resource.id)){
       savedResources = this.state.savedResources.slice();
-      savedResources.splice(savedResources.indexOf(resource, 1));
+      savedResources.splice(savedResources.indexOf(resource), 1);
     }
     this.setState({
       savedResources: savedResources,
+    })
+  }
+
+  uploadResources = (resources) => {
+    this.setState({
+      savedResources: resources.slice(),
     })
   }
 
@@ -103,7 +124,6 @@ class App extends Component {
         ref={instance => { this.mapItem = instance }}
         locationAddressHashTable={this.state.locationAddressHashTable}
       />
-
 
     return (
 
@@ -126,17 +146,17 @@ class App extends Component {
               data={this.state.orgs}
               haveCoords={this.state.haveCoords}
               currentPos={this.state.position}
-              fullWidth={false}
-              addItem={this.saveResource}
+              fullWidth={true}
+              saveItem={this.saveResource}
             />
           </SplitScreen.SlidingPane>
-          <SplitScreen.TogglePane 
-            isOpen={this.state.isSavedResourcePaneOpen}>
+          <SplitScreen.TogglePane isOpen={this.state.isSavedResourcePaneOpen}>
             <ShoppingCart 
-              instance={instance => { this.resultListItem = instance }} 
-              orgs={this.state.savedResources}
-              addItem={this.addItem}
-              removeItem={this.removeResource}>
+              data={this.state.savedResources}
+              reOrder={this.orderResources}
+              addItem={this.saveResource}
+              removeItem={this.removeResource}
+              uploadItems={this.uploadResources}>
             </ShoppingCart>
           </SplitScreen.TogglePane>
         </SplitScreen>

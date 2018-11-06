@@ -1,60 +1,73 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Card, 
-  CardTitle, 
   CardBody, 
-  CardText, 
-  CardSubtitle, 
   CardHeader,
 } from 'reactstrap';
-import ResultList from './ResultList'
+import { downloadObjectAsJson } from '../utils/DownloadHelper.js';
+import FileUpload from './FileUpload/FileUpload.js';
+import styles from './ShoppingCart.module.css';
+import SavedResources from './SavedResources/SavedResources';
 
-// import styles from './ResultList.module.css';
-
-
-export class ShoppingCart extends React.Component {
-
+class ShoppingCart extends React.Component {
   constructor(props){
     super(props);
 
     this.state = {
-      savedItems: [],
+      showUpload: false,
     }
-    
+
+    this.toggleUpload = this.toggleUpload.bind(this);
+  }
+  toggleUpload = () => {
+    this.setState({showUpload: !this.state.showUpload});
   }
 
   render() {
     return (
       <div>
         <Card>
-          <CardHeader> Saved Resources </CardHeader>
-          <CardBody>
-            <CardSubtitle>Save, organize and re-order your resources here</CardSubtitle>
-            <ResultList 
+          <CardHeader>Saved Resources 
+            <span>
+              <button 
+                title='Upload Resources' 
+                className={styles['upload-download-buttons']} 
+                onClick={() => this.toggleUpload()}
+              > 
+                ⬆️ 
+              </button>
+              <button 
+                title='Download Resources' 
+                className={styles['upload-download-buttons']} 
+                onClick={() => {downloadObjectAsJson(this.props.data, 'YourFile');}}
+              > 
+                ⬇️  
+              </button>
+            </span>
+          </CardHeader>
+          <CardBody className={styles['shopping-cart-card']}>
+            { this.state.showUpload ? <FileUpload handleData={this.props.uploadItems} toggleUpload={this.toggleUpload}/> : null }
+            <SavedResources 
               fullWidth={true} 
-              ref={instance => { this.resultListItem = this.props.instance }} 
-              data={this.props.orgs}
+              data={this.props.data}
+              reOrder={this.props.reOrder}
               addItem={this.props.addItem}
-              removeItem={this.props.removeItem}/>
+              removeItem={this.props.removeItem}
+            />
           </CardBody>
         </Card>
       </div>
-      )
+    )
   }
+}
 
-  // constructor(props){
-  //   super(props)
-
-
-  //   // this.listRef = React.createRef()
-  // }
-
-  // scrollToElement = (id) => {
-  //   this.refs[id].getRef()
-
-
-  // }
-
+ShoppingCart.propTypes = {
+  data: PropTypes.array.isRequired,
+  reOrder: PropTypes.func.isRequired,
+  addItem: PropTypes.func.isRequired,
+  removeItem: PropTypes.func.isRequired,
+  uploadItems: PropTypes.func.isRequired,
 }
 
 export default ShoppingCart;
