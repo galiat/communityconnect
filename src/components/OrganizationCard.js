@@ -16,7 +16,9 @@ class OrganizationCard extends Component {
   }
 
   getRef = () => {
-    this.refs.cardRef.scrollIntoView({block: "center", inline: "center"})
+    this.refs.cardRef.parentNode.scrollTop = this.refs.cardRef.offsetTop - ((1.5) * this.refs.cardRef.offsetHeight);
+    // Using scrollIntoView shifted the page, hiding the header bar in mobile view
+    // this.refs.cardRef.scrollIntoView({block: "end", inline: "center"})
   }
 
   cardClick= (e) => {
@@ -35,13 +37,13 @@ class OrganizationCard extends Component {
     this.setState({
       animateButtonInside: styles['animate-button-click'],
       animateButtonOutside: classes,
-    });    
+    });
     setTimeout(() => {
         this.setState({
           animateButtonInside: '',
           animateButtonOutside: [''],
         });
-      }, 
+      },
       500
     );
   }
@@ -50,12 +52,12 @@ class OrganizationCard extends Component {
     const { id , name, categoryautosortscript, overview, location, website, facebookUrl,
       instagramUrl, twitterUrl, phone } = this.props.organization;
 
-
+      console.log('name: ' + name);
     let distance, distanceElement;
     if(this.props.haveCoords){
       distance = getDistance({coordinates: this.props.organization.coordinates}, this.props.currentPos )
       if(distance){
-        distanceElement = <p>Distance from your Location: {distance.toPrecision(4)} miles</p>
+        distanceElement = <p>Distance from your Location: {distance} miles</p>
       }
     }
 
@@ -65,29 +67,30 @@ class OrganizationCard extends Component {
         <Card className={styles.Card} id={this.props.index} onClick={this.cardClick}>
           <CardBody>
             <span onClick={(e)=> e.stopPropagation()}>
-              <button 
+              <button
                 className={[
                             styles['cbutton--effect-radomir'],
                             styles['cbutton'],
                           ].join(' ')}
               >
               <span
-                title='Add item to Saved Resources' 
-                aria-label='Add item to Saved Resources' 
+                title='Add item to Saved Resources'
+                aria-label='Add item to Saved Resources'
                 className={[
-                            this.state.animateButtonInside, 
+                            this.state.animateButtonInside,
                             styles['save-item'],
-                          ].join(' ')} 
+                          ].join(' ')}
                 onClick={this.saveItem}>
               +
               </span>
-                <span 
+                <span
                   className={this.state.animateButtonOutside.join(' ')}
                 >
                 </span>
               </button>
             </span>
             {website && <span><a href={website}>&#128279;</a></span>}
+
             <h3 className={styles.CardBody_headline}>{name}</h3>
             <CardSubtitle className={styles.CardBody_CardSubtitle}>{categoryautosortscript}</CardSubtitle>
             {distance && <div>{distanceElement}</div>}
