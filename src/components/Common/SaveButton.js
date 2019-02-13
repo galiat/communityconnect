@@ -7,6 +7,7 @@ class SaveButton extends Component {
         this.state = {
             animateButtonInside: '',
             animateButtonOutside: [''],
+            buttonText: '+',
         }
 
         this.cardRef = React.createRef();
@@ -23,6 +24,7 @@ class SaveButton extends Component {
         this.setState({
             animateButtonInside: styles['animate-button-click'],
             animateButtonOutside: classes,
+            buttonText: '-',
         });
         setTimeout(() => {
             this.setState({
@@ -35,6 +37,7 @@ class SaveButton extends Component {
     }
 
     render() {
+
         return (
             <span onClick={this.handleClick}>
                 <button
@@ -50,7 +53,7 @@ class SaveButton extends Component {
                             this.state.animateButtonInside,
                             styles['save-item'],
                         ].join(' ')}>
-                        +
+                        {this.state.buttonText}
                   </span>
                     <span
                         className={this.state.animateButtonOutside.join(' ')}
